@@ -1,0 +1,22 @@
+{
+    "name": "gizmola/navibridge",
+    "type": "library",
+    "description": "Denso Navibridge URL helper clas",
+    "keywords": ["Denso", "NaviBridge", "PHP"],
+    "homepage": "http://www.gizmola.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "David Rolston",
+            "email": "gizmola@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": { "gizmola\\NaviBridge\\": ""}
+    },
+    "target-dir": "gizmola/NaviBridge",
+    "minimum-stability": "dev"
+}
