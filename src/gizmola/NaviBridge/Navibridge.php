@@ -63,12 +63,12 @@ class Navibridge
     {
         $this->ver = self::NAVI_SCHEME_VERSION;
         foreach($config as $key => $value) {
-            if (in_array($configKeys, $key)) {
+            if (in_array($key, $this->configKeys)) {
                 $this->$key = $value;
             }
         }
         
-        if (!$this->checkConfig) {
+        if (!$this->checkConfig()) {
             throw new \Exception('A Required initialization parameter is missing.');
         }
     }
@@ -76,7 +76,9 @@ class Navibridge
     protected function checkConfig()
     {
         $pass = true;
-        foreach ($required as $keyname) {
+        foreach ($this->required as $keyname) {
+            //var_dump($keyname); die();
+            
             $pass = (isset($this->$keyname));
             if (!$pass) break;
         }
@@ -86,22 +88,25 @@ class Navibridge
     /*
      * $waypoint = array(array(' 
      */
-    protected function addWaypoint($waypoint)
+    public function addWaypoint($waypoint)
     {
-        $this->waypoint[] = $waypoint;
+        $this->waypoints[] = $waypoint;
         $this->entryCount++;
     }
     
     public function getTarget()
     {
         
-        if (1 > $this->entryCount) {
-            $multiWaypoints = (1 < $this->entryCount);
+        if (1 >= $this->entryCount) {
+            $multiWaypoints = (1 <= $this->entryCount);
             $target = ($multiWaypoints) ? self::NAVI_SCHEME . self::NAVI_ENDPOINT_SINGLE : self::NAVI_SCHEME . self::NAVI_ENDPOINT_MULTI;
-            foreach($waypoints as $waypoint) {
-                foreach ($order as $keyname) {
+            
+            $target .= 'ver=' . urlencode($this->ver) . '&appName=' . urlencode($this->appName) . '&';
+            
+            foreach($this->waypoints as $waypoint) {
+                foreach ($this->order as $keyname) {
                     if (array_key_exists($keyname, $waypoint)) {
-                        $target .= $keyname . '=' . $waypoint['keyname'] . '&';
+                        $target .= $keyname . '=' . urlencode($waypoint[$keyname]) . '&';
                     }
                 }
             }
@@ -109,10 +114,15 @@ class Navibridge
             if ('&' == substr($target, -1)) {
                 $target = rtrim($target, '&');
             }
-            return urlencode($target);
+            
+            if (isset($this->callURL))
+                $target .= 'callURL=' . urlencode($this->callURL);
+            
+            return $target;
             
         } else {
-            return "";
+            // If a link can't be generated, just return empty string
+            return '';
         }
     }
 }
