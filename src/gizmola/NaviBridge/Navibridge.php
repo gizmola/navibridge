@@ -92,6 +92,11 @@ class Navibridge
         $this->waypoints[] = $waypoint;
         $this->entryCount++;
     }
+
+    protected function cleanTel($tel)
+    {
+        return preg_replace('/[^0-9+*#]/', '', $tel);
+    }
     
     public function getTarget()
     {
@@ -109,8 +114,13 @@ class Navibridge
                 foreach ($this->order as $keyname) {
                     
                     if (array_key_exists($keyname, $waypoint)) {
-                        if ($keyname == 'title')
-                            $waypoint['title'] = mb_strimwidth($waypoint['title'], 0, self::MAX_TITLE_LEN);
+                        // Attribute constraint handling
+                        switch ($keyname) {
+                            case 'title':
+                                $waypoint['title'] = mb_strimwidth($waypoint['title'], 0, self::MAX_TITLE_LEN);
+                            case 'tel':
+                                $waypoint['tel'] = $this->cleanTel($waypoint['tel']);
+                        }
                         $target .= $keyname . '=' . urlencode($waypoint[$keyname]) . '&';
                     }
                 }
@@ -124,8 +134,6 @@ class Navibridge
             if ('&' == substr($target, -1)) {
                 $target = rtrim($target, '&');
             }
-            
-
             
             return $target;
             
