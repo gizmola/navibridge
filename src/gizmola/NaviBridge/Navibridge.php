@@ -108,13 +108,17 @@ class Navibridge
                     }
                 }
             }
+            
+            // Add return url if it exists
+            if (isset($this->callURL))
+                $target .= 'callURL=' . urlencode($this->callURL);
+            
             // Remove the trailing ampersand
             if ('&' == substr($target, -1)) {
                 $target = rtrim($target, '&');
             }
             
-            if (isset($this->callURL))
-                $target .= 'callURL=' . urlencode($this->callURL);
+
             
             return $target;
             
