@@ -27,6 +27,7 @@ class Navibridge
     const NAVI_ENDPOINT_MULTI = 'setMultiPOI?';
     
     const MAX_POI = 5;
+    const MAX_TITLE_LEN = 26;
     
     protected $entryCount = 0;
     /*
@@ -42,7 +43,7 @@ class Navibridge
      * Parameters have to be returned in order, or NaviBridge will error
      * 
      */
-    protected $order = array('ver', 'appName', 'll', 'addr', 'title', 'tel', 'text', 'callURL');
+    protected $order = array('ver', 'll', 'addr', 'appName', 'title', 'radKM', 'radML', 'tel', 'text', 'callURL');
     
     protected $configKeys = array('ver', 'appName', 'callURL');
     
@@ -97,13 +98,19 @@ class Navibridge
         
         if (1 >= $this->entryCount) {
             $multiWaypoints = (1 <= $this->entryCount);
+            // Set Scheme
             $target = ($multiWaypoints) ? self::NAVI_SCHEME . self::NAVI_ENDPOINT_SINGLE : self::NAVI_SCHEME . self::NAVI_ENDPOINT_MULTI;
-            
-            $target .= 'ver=' . urlencode($this->ver) . '&appName=' . urlencode($this->appName) . '&';
+            //Set version
+            $target .= 'ver=' . urlencode($this->ver) . '&';
             
             foreach($this->waypoints as $waypoint) {
+                // Inject 'appName'
+                $waypoint['appName'] = $this->appName;
                 foreach ($this->order as $keyname) {
+                    
                     if (array_key_exists($keyname, $waypoint)) {
+                        if ($keyname == 'title')
+                            $waypoint['title'] = mb_strimwidth($waypoint['title'], 0, self::MAX_TITLE_LEN);
                         $target .= $keyname . '=' . urlencode($waypoint[$keyname]) . '&';
                     }
                 }
